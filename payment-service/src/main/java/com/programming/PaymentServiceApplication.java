@@ -10,7 +10,7 @@ public class PaymentServiceApplication {
 
     @PostConstruct
     public void setup(){
-        Stripe.apiKey = "sk_test_51OyXRXSHahRma8MWYejurh6kIyzRdp0h5tt5wBNnLK9LxYocmttC7GsOSRhC9XCp42YWLa0o4OJqFqdPwMRpqnam00YvADml0g";
+        Stripe.apiKey = "sk_test_51PH1GmSBC2UiAEfDhIBuAfMxKcNWNJ94epEVvjPCpmXgP6YGK1pJYfBvnMlGuDrLtbsKIAsFWtijdpZ0YwWih80L00ySMXcnSZ";
     }
 
     public static void main(String[] args) {

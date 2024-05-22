@@ -1,5 +1,6 @@
 package com.learningmicroservices.orderservice.service;
 
+import com.learningmicroservices.orderservice.Enum;
 import com.learningmicroservices.orderservice.dto.InventoryResponse;
 import com.learningmicroservices.orderservice.dto.OrderLineItemsDto;
 import com.learningmicroservices.orderservice.dto.OrderRequest;
@@ -57,6 +58,7 @@ public class OrderService {
                 .allMatch(InventoryResponse::isInStock);
 
         if (allProductsInStock) {
+            order.setPaymentStatus(Enum.PaymentStatus.PENDING_PAYMENT);
             orderRepository.save(order);
             kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
             return "Order Placed Successful";
@@ -72,5 +74,17 @@ public class OrderService {
         orderLineItems.setSkuCode(orderLineItemsDto.getSkuCode());
         return orderLineItems;
     }
+
+//    public void updateOrderPaymentStatus() {
+//        // Find the latest order with PENDING_PAYMENT status
+//        Order order = orderRepository.findFirstByPaymentStatusOrderByCreatedAtDesc(Enum.PaymentStatus.PENDING_PAYMENT);
+//
+//        if (order != null) {
+//            // Update payment status of the order to PAYMENT_COMPLETE
+//            order.setPaymentStatus(Enum.PaymentStatus.PAYMENT_COMPLETE);
+//            orderRepository.save(order);
+//        }
+//    }
+
 }
 

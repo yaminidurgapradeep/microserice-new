@@ -33,7 +33,6 @@ public class PaymentService {
                         )
                         .build();
 
-        // Create a PaymentIntent with the order amount and currency
         PaymentIntent paymentIntent = null;
         try {
             paymentIntent = PaymentIntent.create(params);
