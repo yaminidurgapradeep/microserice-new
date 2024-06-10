@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
@@ -46,13 +44,11 @@ public class OrderController {
 
     @PostMapping("/update-payment-status")
     public void updateOrderPaymentStatus(HttpServletResponse response) {
-        Order order = orderRepository.findFirstByPaymentStatus(Enum.PaymentStatus.PENDING_PAYMENT);
-        if (order != null) {
-            order.setPaymentStatus(Enum.PaymentStatus.PAYMENT_COMPLETE);
-            orderRepository.save(order);
+        boolean success = orderService.updateOrderPaymentStatus();
+        if (success) {
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
         }
     }
 

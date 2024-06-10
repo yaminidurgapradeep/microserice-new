@@ -8,4 +8,3 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Order findFirstByPaymentStatus(Enum.PaymentStatus paymentStatus);
 }
-

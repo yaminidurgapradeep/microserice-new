@@ -8,15 +8,13 @@ import com.stripe.model.Event;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.stripe.net.Webhook;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @RestController
+@RequestMapping("/api/payment")
 public class StripeWebhookController {
 
     @Autowired
@@ -55,7 +53,7 @@ public class StripeWebhookController {
                 case "payment_intent.succeeded":
                     log.info("Payment Successful");
                     webClientBuilder.build().post()
-                            .uri("http://localhost:8081/api/order/update-payment-status")
+                            .uri("http://order-service/api/order/update-payment-status")
                             .retrieve()
                             .toBodilessEntity()
                             .block();

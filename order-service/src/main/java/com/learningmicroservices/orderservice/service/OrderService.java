@@ -8,7 +8,6 @@ import com.learningmicroservices.orderservice.event.OrderPlacedEvent;
 import com.learningmicroservices.orderservice.model.Order;
 import com.learningmicroservices.orderservice.model.OrderLineItems;
 import com.learningmicroservices.orderservice.repository.OrderRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,10 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+
+    @Autowired
     private final WebClient.Builder webClientBuilder;
+
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     public String placeOrder(OrderRequest orderRequest) {
@@ -75,16 +77,16 @@ public class OrderService {
         return orderLineItems;
     }
 
-//    public void updateOrderPaymentStatus() {
-//        // Find the latest order with PENDING_PAYMENT status
-//        Order order = orderRepository.findFirstByPaymentStatusOrderByCreatedAtDesc(Enum.PaymentStatus.PENDING_PAYMENT);
-//
-//        if (order != null) {
-//            // Update payment status of the order to PAYMENT_COMPLETE
-//            order.setPaymentStatus(Enum.PaymentStatus.PAYMENT_COMPLETE);
-//            orderRepository.save(order);
-//        }
-//    }
+    public boolean updateOrderPaymentStatus() {
+        Order order = orderRepository.findFirstByPaymentStatus(Enum.PaymentStatus.PENDING_PAYMENT);
+        if (order != null) {
+            order.setPaymentStatus(Enum.PaymentStatus.PAYMENT_COMPLETE);
+            orderRepository.save(order);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }
 

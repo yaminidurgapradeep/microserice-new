@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
 
+//    private final String stripeApiKey = "sk_test_51PH1GmSBC2UiAEfDhIBuAfMxKcNWNJ94epEVvjPCpmXgP6YGK1pJYfBvnMlGuDrLtbsKIAsFWtijdpZ0YwWih80L00ySMXcnSZ";
+
     public CreatePaymentIntentResponse createPaymentIntent(CreatePaymentIntentRequest createPaymentIntentRequest) {
         long sum = Double.valueOf(createPaymentIntentRequest.getItems().stream().mapToDouble(CreatePaymentItem::getPrice).sum()).longValue();
         PaymentIntentCreateParams params =
