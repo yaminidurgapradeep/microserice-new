@@ -1,5 +1,6 @@
 package com.learningmicroservices.orderservice.service;
 
+import com.learningmicroservices.orderservice.Enum;
 import com.learningmicroservices.orderservice.dto.InventoryResponse;
 import com.learningmicroservices.orderservice.dto.OrderLineItemsDto;
 import com.learningmicroservices.orderservice.dto.OrderRequest;
@@ -7,7 +8,6 @@ import com.learningmicroservices.orderservice.event.OrderPlacedEvent;
 import com.learningmicroservices.orderservice.model.Order;
 import com.learningmicroservices.orderservice.model.OrderLineItems;
 import com.learningmicroservices.orderservice.repository.OrderRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,10 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+
+    @Autowired
     private final WebClient.Builder webClientBuilder;
+
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     public String placeOrder(OrderRequest orderRequest) {
@@ -57,6 +60,7 @@ public class OrderService {
                 .allMatch(InventoryResponse::isInStock);
 
         if (allProductsInStock) {
+            order.setPaymentStatus(Enum.PaymentStatus.PENDING_PAYMENT);
             orderRepository.save(order);
             kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
             return "Order Placed Successful";
@@ -72,5 +76,17 @@ public class OrderService {
         orderLineItems.setSkuCode(orderLineItemsDto.getSkuCode());
         return orderLineItems;
     }
+
+    public boolean updateOrderPaymentStatus() {
+        Order order = orderRepository.findFirstByPaymentStatus(Enum.PaymentStatus.PENDING_PAYMENT);
+        if (order != null) {
+            order.setPaymentStatus(Enum.PaymentStatus.PAYMENT_COMPLETE);
+            orderRepository.save(order);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
 

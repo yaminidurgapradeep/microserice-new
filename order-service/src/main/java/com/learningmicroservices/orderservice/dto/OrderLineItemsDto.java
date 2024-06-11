@@ -15,4 +15,7 @@ public class OrderLineItemsDto {
     private BigDecimal price;
     private Integer quantity;
 
+    public OrderLineItemsDto(String sku123, BigDecimal bigDecimal, int i) {
+
+    }
 }

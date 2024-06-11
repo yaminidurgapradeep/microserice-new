@@ -1,15 +1,18 @@
 package com.learningmicroservices.orderservice.controller;
 
+import com.learningmicroservices.orderservice.Enum;
 import com.learningmicroservices.orderservice.dto.OrderRequest;
+import com.learningmicroservices.orderservice.model.Order;
+import com.learningmicroservices.orderservice.repository.OrderRepository;
 import com.learningmicroservices.orderservice.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
@@ -20,6 +23,9 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class OrderController {
     private final OrderService orderService;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,6 +40,16 @@ public class OrderController {
     public CompletableFuture<String> fallbackMethod(OrderRequest orderRequest, RuntimeException runtimeException) {
         log.info("Cannot place order executing fallback logic");
         return CompletableFuture.supplyAsync(() -> "Oops! Something went wrong, please order after some time!");
+    }
+
+    @PostMapping("/update-payment-status")
+    public void updateOrderPaymentStatus(HttpServletResponse response) {
+        boolean success = orderService.updateOrderPaymentStatus();
+        if (success) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+        }
     }
 
 }
